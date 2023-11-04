@@ -57,23 +57,28 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 1;
-    public static final int kBackLeftDrivingCanId = 3;
-    public static final int kFrontRightDrivingCanId = 5;
-    public static final int kBackRightDrivingCanId = 7;
+    public static final int kFrontLeftDrivingCanId = 2;
+    public static final int kBackLeftDrivingCanId = 4;
+    public static final int kFrontRightDrivingCanId = 3;
+    public static final int kBackRightDrivingCanId = 5;
 
-    public static final int kFrontLeftTurningCanId = 2;
-    public static final int kBackLeftTurningCanId = 4;
-    public static final int kFrontRightTurningCanId = 6;
-    public static final int kBackRightTurningCanId = 8;
+    public static final int kFrontLeftTurningCanId = 6;
+    public static final int kBackLeftTurningCanId = 8;
+    public static final int kFrontRightTurningCanId = 7;
+    public static final int kBackRightTurningCanId = 9;
 
     //Pigeon CanID
-    public static final int kPigeon2CanId = 9;
+    public static final int kPigeon2CanId = 10;
 
     public static final boolean kGyroReversed = false;
   }
 
   public static final class ElevatorConstants{
+
+    public static final int kElevatorCanID = 11;
+
+    public static final double kFalconToHight = (1.0/2048d)*(1d/12d)*(1.751*Math.PI)*Math.sin(Units.degreesToRadians(50));
+    public static final double kStartingHight = 9.6;
 
     public static class ElevatorSetpoint {
       public double cube;
@@ -86,11 +91,46 @@ public final class Constants {
 
     }
 
-    public static ElevatorSetpoint ZERO = new ElevatorSetpoint(9.600 , 9.600);
+
+
+    public static ElevatorSetpoint ZERO = new ElevatorSetpoint(kStartingHight , kStartingHight);
     public static ElevatorSetpoint CARRY = new ElevatorSetpoint(10.00 , 10.00);
     public static ElevatorSetpoint LEVEL1 = new ElevatorSetpoint(12.50 , 13.00);
     public static ElevatorSetpoint LEVEL2 = new ElevatorSetpoint(32.50 , 40.25);
     public static ElevatorSetpoint LEVEL3 = new ElevatorSetpoint(46.25 , 53.50);
+
+  }
+
+  public static class IntakeConstants {
+      
+    public static final int kIntakeCanID = 12;
+    public static final double kInSpeed = 0.25;
+    public static final double kOutSpeed = 0.40;
+
+    public static final double kS = 1;
+
+    public static enum State {
+      
+      GRAB(-kInSpeed),
+      RELEASE(kOutSpeed),
+      L1RELEASE(0.1),
+      L2RELEASE(0.15),
+      L3RELEASE(0.275),
+      L3RELEASETELE(0.3),
+      IDLE(-kS/12),
+      STOP(0),
+      STARTING(0);
+
+      public final double speed;
+
+      /**
+       * @param speed Motor Percentage
+       */
+      State(double speed) {
+        this.speed = speed;
+      }
+
+    }
 
   }
 

@@ -1,8 +1,10 @@
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.DriverConstants;
@@ -28,14 +30,15 @@ public class CommandFactory {
 `    * All inputs are (-1,1) and scaled to the max speed.
      * Output is field relative
      */
-    public Command TeleopSwerve(DoubleSupplier _xInput, DoubleSupplier _yInput, DoubleSupplier _rInput){
+    public Command TeleopSwerve(DoubleSupplier _xInput, DoubleSupplier _yInput, DoubleSupplier _rInput, BooleanSupplier _Snap){
         return new RunCommand(
             () -> drivetrain.drive(
                 -MathUtil.applyDeadband(_xInput.getAsDouble(), DriverConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(_yInput.getAsDouble(), DriverConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(_rInput.getAsDouble(), DriverConstants.kDriveDeadband),
                 true, 
-                RobotBase.isReal()
+                RobotBase.isReal(),
+                _Snap.getAsBoolean()
             ),
             drivetrain
         );

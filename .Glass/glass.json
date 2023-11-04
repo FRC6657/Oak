@@ -1,0 +1,55 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "Field": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/ChoreoSwerveControllerCommand_field": "Field2d",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/SendableChooser[1]": "String Chooser",
+      "/SmartDashboard/SendableChooser[2]": "String Chooser"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Robot": {
+          "length": 0.8999999761581421,
+          "width": 0.8999999761581421
+        },
+        "module-0": {
+          "length": 0.25,
+          "width": 0.25
+        },
+        "module-1": {
+          "length": 0.25,
+          "width": 0.25
+        },
+        "module-2": {
+          "length": 0.25,
+          "width": 0.25
+        },
+        "module-3": {
+          "length": 0.25,
+          "width": 0.25
+        },
+        "trajPoses": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "6657"
+  }
+}

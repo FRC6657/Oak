@@ -151,12 +151,15 @@ public class Drivetrain extends SubsystemBase {
    *                      field.
    * @param _rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative, boolean _rateLimit) {
+  public void drive(double _xSpeed, double _ySpeed, double _rot, boolean _fieldRelative, boolean _rateLimit, boolean _Snap) {
 
     //This method is for joystick values, so scale values just incase.
     _xSpeed = MathUtil.clamp(_xSpeed, -1, 1);
     _ySpeed = MathUtil.clamp(_ySpeed, -1, 1);
     _rot = MathUtil.clamp(_rot, -1, 1);
+    SmartDashboard.putNumber("angle", getSnapAngle());
+    SmartDashboard.putNumber("angle test", -gyro.getAngle());
+
 
     double xSpeedCommanded;
     double ySpeedCommanded;
@@ -182,6 +185,16 @@ public class Drivetrain extends SubsystemBase {
       ySpeedCommanded = _ySpeed;
       currentRotation = _rot;
     }
+
+    if(_Snap){
+      xSpeedCommanded = xSpeedCommanded*0.5;
+      ySpeedCommanded = ySpeedCommanded*0.5;
+      currentRotation = (getSnapAngle()+gyro.getAngle())*0.01;
+      SmartDashboard.putNumber("Current rotation", currentRotation);
+
+    }
+
+
 
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
@@ -212,6 +225,22 @@ public class Drivetrain extends SubsystemBase {
     backLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     backRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
+
+  private double getSnapAngle(){
+    double angle = gyro.getAngle();
+    if(Math.abs(gyro.getAngle() % 90) > 45){
+      if(-gyro.getAngle() > 0){
+        return -gyro.getAngle() + (90 + gyro.getAngle() % 90);
+      }else{
+        return -gyro.getAngle() -(90 - gyro.getAngle() % 90);
+      }
+    }else{
+      return -gyro.getAngle() + gyro.getAngle() % 90; 
+    }
+    
+  }
+
+
 
   /**
    * Sets the swerve ModuleStates.

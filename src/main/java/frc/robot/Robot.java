@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -60,23 +62,30 @@ public class Robot extends TimedRobot {
     //Set the default command for the drivetrain to allow for teleop control
     drivetrain.setDefaultCommand(
       commandFactory.TeleopSwerve(
-        () -> driveController.getLeftY(),
-        () -> driveController.getLeftX(),
-        () -> driveController.getRightX()
+        () -> driveController.getLeftY() * 0.2,
+        () -> driveController.getLeftX() * 0.2,
+        () -> driveController.getRightX() * 0.2,
+        () -> driveController.a().getAsBoolean()
       )
     );
+
+    driveController.b().onTrue(
+      Commands.runOnce(drivetrain::zeroHeading, drivetrain)
+    );
+
+    
 
     TrajectoryManager.getInstance().LoadTrajectories();
 
     BumpSide = TrajectoryManager.getInstance().getTrajectory("Bump Side.json");
     Charge = TrajectoryManager.getInstance().getTrajectory("Charge.json");
     SubSide = TrajectoryManager.getInstance().getTrajectory("Sub Side.json");
-    Test = TrajectoryManager.getInstance().getTrajectory("Test.json");
+    Test = TrajectoryManager.getInstance().getTrajectory("Y4.json");
 
-    pathChooser.setDefaultOption("Bump Side", BumpSide);
-    pathChooser.addOption("Charge", Charge);
-    pathChooser.addOption("Sub Side", SubSide);
-    pathChooser.addOption("Test", Test);
+    // pathChooser.setDefaultOption("Bump Side", BumpSide);
+    // pathChooser.addOption("Charge", Charge);
+    // pathChooser.addOption("Sub Side", SubSide);
+    pathChooser.setDefaultOption("Test", Test);
 
     pieceChooser.setDefaultOption("Cone", true);
     pieceChooser.addOption("Cube", false);
@@ -150,7 +159,7 @@ public class Robot extends TimedRobot {
         // Commands.runOnce(() -> elevator.setHeight(ElevatorConstants.CARRY), elevator),
         // Commands.waitUntil(elevator::atSetpoint),
         swerveControllerCommand,
-        Commands.runOnce(() -> drivetrain.drive(0, 0, 0, true, true), drivetrain),
+        Commands.runOnce(() -> drivetrain.drive(0, 0, 0, true, true, false), drivetrain),
         Commands.runOnce(drivetrain::setX, drivetrain)
       )
     );
