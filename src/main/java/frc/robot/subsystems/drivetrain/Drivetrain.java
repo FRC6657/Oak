@@ -64,6 +64,7 @@ public class Drivetrain extends SubsystemBase {
   private SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
 
   double fieldRelativeOffset = 0;
+  double feildRelativeChange = 0;
 
   // Pose Estimator class for tracking robot pose
   SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
@@ -203,7 +204,7 @@ public class Drivetrain extends SubsystemBase {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
       _fieldRelative
-      ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-gyro.getAngle() + fieldRelativeOffset))
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-gyro.getAngle() + fieldRelativeOffset + feildRelativeChange))
       : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered)
     );
 
@@ -238,6 +239,10 @@ public class Drivetrain extends SubsystemBase {
       return -gyro.getAngle() + gyro.getAngle() % 90; 
     }
     
+  }
+
+  public void changeFeildRelative(){
+    feildRelativeChange =  gyro.getAngle() - fieldRelativeOffset;
   }
 
 

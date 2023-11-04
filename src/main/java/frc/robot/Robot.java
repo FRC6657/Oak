@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
     );
 
     driveController.b().onTrue(
-      Commands.runOnce(drivetrain::zeroHeading, drivetrain)
+      Commands.runOnce(drivetrain::changeFeildRelative, drivetrain)
     );
 
     
