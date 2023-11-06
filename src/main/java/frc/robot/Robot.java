@@ -7,23 +7,30 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriverConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorSetpoint;
-import frc.robot.commands.CommandFactory;
+import frc.robot.Constants.ElevatorConstants.GamePiece;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.choreolib.ChoreoSwerveControllerCommand;
 import lib.choreolib.ChoreoTrajectory;
@@ -34,24 +41,25 @@ public class Robot extends TimedRobot {
 
   //Subsystems
   private final Drivetrain drivetrain = new Drivetrain();
-
-  //Command Factory
-  private final CommandFactory commandFactory = new CommandFactory(drivetrain);
+  private final Elevator elevator = new Elevator();
+  private final Intake intake = new Intake();
 
   //Controllers
   private final CommandXboxController driveController = new CommandXboxController(DriverConstants.kDriverControllerPort);
+  private final CommandGenericHID operatorController = new CommandGenericHID(DriverConstants.kOperatorControllerPort);
 
   ChoreoTrajectory BumpSide;
   ChoreoTrajectory Charge;
   ChoreoTrajectory SubSide;
   ChoreoTrajectory Test;
 
-  SendableChooser<Boolean> pieceChooser = new SendableChooser<Boolean>();
+  SendableChooser<GamePiece> pieceChooser = new SendableChooser<GamePiece>();
   SendableChooser<ElevatorSetpoint> levelChooser = new SendableChooser<ElevatorSetpoint>();
   SendableChooser<ChoreoTrajectory> pathChooser = new SendableChooser<ChoreoTrajectory>();
 
   Field2d field = new Field2d();
   private final FieldObject2d[] modules = new FieldObject2d[4];
+
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization code.
@@ -59,22 +67,72 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit(){
 
-    //Set the default command for the drivetrain to allow for teleop control
+    ShuffleboardTab diverUITab = Shuffleboard.getTab("Driver UI");
+
     drivetrain.setDefaultCommand(
-      commandFactory.TeleopSwerve(
-        () -> driveController.getLeftY() * 0.2,
-        () -> driveController.getLeftX() * 0.2,
-        () -> driveController.getRightX() * 0.2,
-        () -> driveController.a().getAsBoolean()
+      new RunCommand(
+        () -> drivetrain.drive(
+          -driveController.getLeftY() * 0.2, 
+          -driveController.getLeftX() * 0.2, 
+          -driveController.getRightX() * 0.2, 
+          true,
+          RobotBase.isReal(),
+          driveController.a().getAsBoolean()
+        ),
+        drivetrain
       )
     );
 
+    //Driver Controls
     driveController.b().onTrue(
       Commands.runOnce(drivetrain::changeFeildRelative, drivetrain)
     );
 
-    
+    driveController.leftTrigger().onTrue(
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.GRAB))
+    );
 
+    driveController.leftTrigger().onFalse(
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP))
+    );
+
+    driveController.rightTrigger().onTrue(
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE))
+    );
+
+    driveController.rightTrigger().onFalse(
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP))
+    );
+
+    operatorController.button(1).onTrue(
+      Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.LEVEL1), elevator)
+    );
+
+    operatorController.button(2).onTrue(
+      Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.LEVEL2), elevator)
+    );
+
+    operatorController.button(3).onTrue(
+      Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.LEVEL3), elevator)
+    );
+
+    operatorController.button(4).onTrue(
+      Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.DOUBLESUB), elevator)
+    );
+
+    operatorController.button(7).onTrue(
+      Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.CARRY), elevator)
+    );
+
+    operatorController.button(8).onTrue(
+      Commands.runOnce(() -> elevator.changeGamePiece(ElevatorConstants.CONE), elevator)
+    );
+
+    operatorController.button(9).onTrue(
+      Commands.runOnce(() -> elevator.changeGamePiece(ElevatorConstants.CUBE), elevator)
+    );
+
+    //Autos
     TrajectoryManager.getInstance().LoadTrajectories();
 
     BumpSide = TrajectoryManager.getInstance().getTrajectory("Bump Side.json");
@@ -87,8 +145,8 @@ public class Robot extends TimedRobot {
     // pathChooser.addOption("Sub Side", SubSide);
     pathChooser.setDefaultOption("Test", Test);
 
-    pieceChooser.setDefaultOption("Cone", true);
-    pieceChooser.addOption("Cube", false);
+    pieceChooser.setDefaultOption("Cone", ElevatorConstants.CONE);
+    pieceChooser.addOption("Cube", ElevatorConstants.CUBE);
 
     levelChooser.setDefaultOption("Level 1", ElevatorConstants.LEVEL1);
     levelChooser.addOption("Level 2", ElevatorConstants.LEVEL2);
@@ -115,6 +173,9 @@ public class Robot extends TimedRobot {
 
     updateField2d();
 
+    intake.log();
+    elevator.log();
+
   }
 
   @Override
@@ -128,7 +189,6 @@ public class Robot extends TimedRobot {
     boolean isBlue = DriverStation.getAlliance() == Alliance.Blue;
 
     var level = levelChooser.getSelected();
-    double elevatorSetpoint = pieceChooser.getSelected() ? level.cone : level.cube;
 
     var thetaController = new PIDController(AutoConstants.kPThetaController, 0, 0);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -151,35 +211,32 @@ public class Robot extends TimedRobot {
 
     CommandScheduler.getInstance().schedule(
       Commands.sequence(
-        // Commands.runOnce(() -> elevator.setHeight(elevatorSetpoint), elevator),
-        // Commands.waitUntil(elevator::atSetpoint),
-        // Commands.runOnce(() -> intake.setSpeed(0.5), intake),
-        // Commands.waitSeconds(0.5),
-        // Commands.runOnce(() -> intake.setSpeed(0), intake),
-        // Commands.runOnce(() -> elevator.setHeight(ElevatorConstants.CARRY), elevator),
-        // Commands.waitUntil(elevator::atSetpoint),
+        Commands.runOnce(() -> elevator.changeGamePiece(pieceChooser.getSelected()), elevator),
+        Commands.runOnce(() -> elevator.changeSetpoint(level), elevator),
+        //Commands.waitUntil(elevator::atSetpoint),
+        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE), intake),
+        Commands.waitSeconds(0.5),
+        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP), intake),
+        Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.CARRY), elevator),
+        //Commands.waitUntil(elevator::atSetpoint),
         swerveControllerCommand,
         Commands.runOnce(() -> drivetrain.drive(0, 0, 0, true, true, false), drivetrain),
         Commands.runOnce(drivetrain::setX, drivetrain)
       )
     );
 
-
-    // if(autonomousCommand != null){
-    //   CommandScheduler.getInstance().schedule(autonomousCommand);
-    // }
   }
 
   @Override
-  public void teleopInit() {
-    // if (autonomousCommand != null) {
-    //   autonomousCommand.cancel();
-    // }
+  public void autonomousPeriodic() {
+    elevator.run();
+    intake.run();
   }
 
   @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
+  public void teleopPeriodic() {
+    elevator.run();
+    intake.run();
   }
 
   private void updateField2d(){

@@ -81,14 +81,12 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public Drivetrain() {
-
     if(DriverStation.getAlliance() == DriverStation.Alliance.Red){
       fieldRelativeOffset = 180;
     }else
     {
       fieldRelativeOffset = 0;
     }
-
   }
 
   /**
@@ -245,8 +243,6 @@ public class Drivetrain extends SubsystemBase {
     feildRelativeChange =  gyro.getAngle() - fieldRelativeOffset;
   }
 
-
-
   /**
    * Sets the swerve ModuleStates.
    *
@@ -306,7 +302,6 @@ public class Drivetrain extends SubsystemBase {
       frontRight.getState(),
       backLeft.getState(),
       backRight.getState(),
-      
     };
   }
 

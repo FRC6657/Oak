@@ -82,8 +82,19 @@
   },
   "NetworkTables": {
     "transitory": {
-      "SmartDashboard": {
+      "Shuffleboard": {
+        "Driver UI": {
+          "open": true
+        },
         "open": true
+      },
+      "SmartDashboard": {
+        "Elevator": {
+          "open": true
+        },
+        "Field": {
+          "open": true
+        }
       }
     }
   },
@@ -91,7 +102,7 @@
     "Plot <0>": {
       "plots": [
         {
-          "height": 0,
+          "height": 192,
           "series": [
             {
               "color": [
@@ -113,7 +124,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

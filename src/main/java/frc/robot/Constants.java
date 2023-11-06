@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -77,49 +78,57 @@ public final class Constants {
 
     public static final int kElevatorCanID = 11;
 
-    public static final double kFalconToHight = (1.0/2048d)*(1d/12d)*(1.751*Math.PI)*Math.sin(Units.degreesToRadians(50));
-    public static final double kStartingHight = 9.6;
+    public static final double kFalconToHeight = (1.0/2048d)*(1d/12d)*(1.751*Math.PI)*Math.sin(Units.degreesToRadians(50));
+    public static final double kStartingHeight = 9.6;
+
+    public static final PIDController kElevatorPID = new PIDController(1/40d, 0, 0);
 
     public static class ElevatorSetpoint {
       public double cube;
       public double cone;
+      public String name;
     
-      public ElevatorSetpoint(double cubeSetpoint, double coneSetpoint) {
+      public ElevatorSetpoint(double cubeSetpoint, double coneSetpoint, String name) {
         this.cube = cubeSetpoint;
         this.cone = coneSetpoint;
+        this.name = name;
       }
 
     }
 
+    public static class GamePiece {
+      public boolean isCone;
+      public GamePiece(boolean isCone) {
+        this.isCone = isCone;
+      }
+    }
 
+    //Various Setpoints
+    public static ElevatorSetpoint ZERO = new ElevatorSetpoint(kStartingHeight, kStartingHeight, "Zero");
+    public static ElevatorSetpoint CARRY = new ElevatorSetpoint(10.00 , 10.00, "Carry");
+    public static ElevatorSetpoint LEVEL1 = new ElevatorSetpoint(12.50 , 13.00, "Level1");
+    public static ElevatorSetpoint LEVEL2 = new ElevatorSetpoint(32.50 , 40.25, "Level2");
+    public static ElevatorSetpoint LEVEL3 = new ElevatorSetpoint(46.25 , 53.50, "Level3");
+    public static ElevatorSetpoint DOUBLESUB = new ElevatorSetpoint(42.00 , 42.00, "Double Substation");
 
-    public static ElevatorSetpoint ZERO = new ElevatorSetpoint(kStartingHight , kStartingHight);
-    public static ElevatorSetpoint CARRY = new ElevatorSetpoint(10.00 , 10.00);
-    public static ElevatorSetpoint LEVEL1 = new ElevatorSetpoint(12.50 , 13.00);
-    public static ElevatorSetpoint LEVEL2 = new ElevatorSetpoint(32.50 , 40.25);
-    public static ElevatorSetpoint LEVEL3 = new ElevatorSetpoint(46.25 , 53.50);
+    //Game Pieces
+    public static GamePiece CUBE = new GamePiece(false);
+    public static GamePiece CONE = new GamePiece(true);
 
   }
 
   public static class IntakeConstants {
       
     public static final int kIntakeCanID = 12;
-    public static final double kInSpeed = 0.25;
-    public static final double kOutSpeed = 0.40;
-
-    public static final double kS = 1;
+    public static final double kInSpeed = 0.5;
+    public static final double kOutSpeed = 0.4;
 
     public static enum State {
       
       GRAB(-kInSpeed),
       RELEASE(kOutSpeed),
-      L1RELEASE(0.1),
-      L2RELEASE(0.15),
-      L3RELEASE(0.275),
-      L3RELEASETELE(0.3),
-      IDLE(-kS/12),
-      STOP(0),
-      STARTING(0);
+      IDLE(-0.1),
+      STOP(0);
 
       public final double speed;
 
@@ -189,6 +198,7 @@ public final class Constants {
   public static final class DriverConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
+    public static final int kOperatorControllerPort = 1;
   }
 
   public static final class RobotConstants {
