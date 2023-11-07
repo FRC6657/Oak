@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -72,9 +73,9 @@ public class Robot extends TimedRobot {
     drivetrain.setDefaultCommand(
       new RunCommand(
         () -> drivetrain.drive(
-          -driveController.getLeftY() * 0.2, 
-          -driveController.getLeftX() * 0.2, 
-          -driveController.getRightX() * 0.2, 
+          -MathUtil.applyDeadband(driveController.getLeftY(), 0.05) * 0.5, 
+          -MathUtil.applyDeadband(driveController.getLeftX(), 0.05) * 0.5, 
+          -MathUtil.applyDeadband(driveController.getRightX(), 0.05) * 0.5, 
           true,
           RobotBase.isReal(),
           driveController.a().getAsBoolean()
@@ -140,9 +141,9 @@ public class Robot extends TimedRobot {
     SubSide = TrajectoryManager.getInstance().getTrajectory("Sub Side.json");
     Test = TrajectoryManager.getInstance().getTrajectory("Y4.json");
 
-    // pathChooser.setDefaultOption("Bump Side", BumpSide);
-    // pathChooser.addOption("Charge", Charge);
-    // pathChooser.addOption("Sub Side", SubSide);
+    pathChooser.setDefaultOption("Bump Side", BumpSide);
+    pathChooser.addOption("Charge", Charge);
+    pathChooser.addOption("Sub Side", SubSide);
     pathChooser.setDefaultOption("Test", Test);
 
     pieceChooser.setDefaultOption("Cone", ElevatorConstants.CONE);
@@ -175,12 +176,14 @@ public class Robot extends TimedRobot {
 
     intake.log();
     elevator.log();
+    drivetrain.log();
 
   }
 
   @Override
   public void simulationPeriodic() {
     drivetrain.simulate();
+    elevator.simulate();
   }
 
   @Override
@@ -213,12 +216,12 @@ public class Robot extends TimedRobot {
       Commands.sequence(
         Commands.runOnce(() -> elevator.changeGamePiece(pieceChooser.getSelected()), elevator),
         Commands.runOnce(() -> elevator.changeSetpoint(level), elevator),
-        //Commands.waitUntil(elevator::atSetpoint),
+        Commands.waitUntil(elevator::atSetpoint),
         Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE), intake),
         Commands.waitSeconds(0.5),
         Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP), intake),
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.CARRY), elevator),
-        //Commands.waitUntil(elevator::atSetpoint),
+        Commands.waitUntil(elevator::atSetpoint),
         swerveControllerCommand,
         Commands.runOnce(() -> drivetrain.drive(0, 0, 0, true, true, false), drivetrain),
         Commands.runOnce(drivetrain::setX, drivetrain)

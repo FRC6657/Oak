@@ -2,19 +2,19 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import java.util.Map;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorSetpoint;
@@ -25,7 +25,8 @@ public class Elevator extends SubsystemBase{
 
     //Delares the elevator motor
     private final WPI_TalonFX mMotor;
-    
+    private final TalonFXSimCollection mMotorSim;
+    private final ElevatorSim mElevatorSim;
     //Declares the PID controller
     private final PIDController mPID = ElevatorConstants.kElevatorPID;
     
@@ -37,6 +38,19 @@ public class Elevator extends SubsystemBase{
      */
     public Elevator(){
         mMotor = new WPI_TalonFX(ElevatorConstants.kElevatorCanID); //Initializes the motor
+        mMotorSim = mMotor.getSimCollection(); //Initializes the motor simulator
+
+        //Initializes the motor simulator
+        mElevatorSim = new ElevatorSim(
+            DCMotor.getFalcon500(1),
+            12d,
+            4,
+            Units.inchesToMeters(1.751*Math.sin(Units.degreesToRadians(50))),
+            Units.inchesToMeters(0),
+            Units.inchesToMeters(54),
+            false
+        );
+
         configureMotor(); //Configures the motor
     };
 
@@ -58,7 +72,7 @@ public class Elevator extends SubsystemBase{
      * @return true if the elevator is at its setpoint
      */
     public boolean atSetpoint() {
-        double heightTolerance = 0.5; 
+        double heightTolerance = 0.5 / 12; 
         return (Math.abs(getHeight() - getPieceSetpoint()) < heightTolerance);
     }
 
@@ -126,6 +140,27 @@ public class Elevator extends SubsystemBase{
         setpointName.setString(mSetpoint.name);
         atSetpointLog.setBoolean(atSetpoint());
         gamePieceLog.setBoolean(mGamePiece.isCone);
+    }
+
+    public void simulate(){
+        mElevatorSim.setInput(mMotor.get() * 12);
+        mElevatorSim.update(0.02);
+        mMotorSim.setIntegratedSensorRawPosition((int)(Units.metersToInches(mElevatorSim.getPositionMeters()) * 1/ElevatorConstants.kFalconToHeight));
+    
+        double height = Units.inchesToMeters((getHeight()-9.6));
+        double motionRatio = Math.sin(Units.degreesToRadians(40))/ Math.sin(Units.degreesToRadians(50));
+
+        //Stage 1 Relative Position
+        // x,y,z w_rot, x_rot, y_rot, z_rot
+        // No rotation, no y translation
+        double elevatorStageLocations[] = {
+            0, 0, 0, 0, 0, 0, 0,
+            (height*motionRatio)/2, 0, height/2, 0, 0, 0, 0,
+            (height*motionRatio), 0, height, 0, 0, 0, 0,
+        };
+
+        SmartDashboard.putNumberArray("ElevatorPoses", elevatorStageLocations);
+    
     }
 
 }

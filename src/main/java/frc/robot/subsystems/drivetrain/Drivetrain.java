@@ -76,7 +76,7 @@ public class Drivetrain extends SubsystemBase {
         backLeft.getPosition(),
         backRight.getPosition()
     }, 
-    new Pose2d(new Translation2d(4,4), new Rotation2d())
+    new Pose2d(new Translation2d(5.5,5.5), new Rotation2d())
   );  
 
   /** Creates a new DriveSubsystem. */
@@ -186,9 +186,9 @@ public class Drivetrain extends SubsystemBase {
     }
 
     if(_Snap){
-      xSpeedCommanded = xSpeedCommanded*0.5;
-      ySpeedCommanded = ySpeedCommanded*0.5;
-      currentRotation = (getSnapAngle()+gyro.getAngle())*0.01;
+      xSpeedCommanded = xSpeedCommanded*0.75;
+      ySpeedCommanded = ySpeedCommanded*0.75;
+      currentRotation = (getSnapAngle()+gyro.getAngle())*0.02;
       SmartDashboard.putNumber("Current rotation", currentRotation);
 
     }
@@ -305,4 +305,26 @@ public class Drivetrain extends SubsystemBase {
     };
   }
 
+  public void log(){
+
+    //This should be alot cleaner with wpilib 2024
+
+    double[] moduleData = {
+      getModuleStates()[0].angle.getRadians(), getModuleStates()[0].speedMetersPerSecond,
+      getModuleStates()[1].angle.getRadians(), getModuleStates()[1].speedMetersPerSecond,
+      getModuleStates()[2].angle.getRadians(), getModuleStates()[2].speedMetersPerSecond,
+      getModuleStates()[3].angle.getRadians(), getModuleStates()[3].speedMetersPerSecond
+    };
+
+    double[] robotPose = {
+      getPose().getX(),
+      getPose().getY(),
+      getPose().getRotation().getRadians()
+    };
+
+    SmartDashboard.putNumberArray("SwerveStates/ModuleStates", moduleData);
+    SmartDashboard.putNumberArray("SwerveStates/RobotPose", robotPose);
+    
+
+  }
 }

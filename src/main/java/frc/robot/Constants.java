@@ -81,7 +81,7 @@ public final class Constants {
     public static final double kFalconToHeight = (1.0/2048d)*(1d/12d)*(1.751*Math.PI)*Math.sin(Units.degreesToRadians(50));
     public static final double kStartingHeight = 9.6;
 
-    public static final PIDController kElevatorPID = new PIDController(1/40d, 0, 0);
+    public static final PIDController kElevatorPID = new PIDController(1/20d, 0, 0);
 
     public static class ElevatorSetpoint {
       public double cube;
