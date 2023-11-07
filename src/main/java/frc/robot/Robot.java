@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit(){
 
-    ShuffleboardTab diverUITab = Shuffleboard.getTab("Driver UI");
+    ShuffleboardTab driverUITab = Shuffleboard.getTab("Driver UI");
 
     drivetrain.setDefaultCommand(
       new RunCommand(
@@ -152,11 +152,10 @@ public class Robot extends TimedRobot {
     levelChooser.setDefaultOption("Level 1", ElevatorConstants.LEVEL1);
     levelChooser.addOption("Level 2", ElevatorConstants.LEVEL2);
     levelChooser.addOption("Level 3",ElevatorConstants.LEVEL3);
-    
-    SmartDashboard.putData(pathChooser);
-    SmartDashboard.putData(pieceChooser);
-    SmartDashboard.putData(levelChooser);
-    
+
+    driverUITab.add("Auto Path", pathChooser).withSize(2, 1).withPosition(5, 0);
+    driverUITab.add("Auto Game Piece", pieceChooser).withSize(2, 1).withPosition(5, 1);
+    driverUITab.add("Auto Scoring Level", levelChooser).withSize(2, 1).withPosition(5, 2);
 
     for (int i = 0; i < modules.length; i++) {
       modules[i] = field.getObject("module-" + i);

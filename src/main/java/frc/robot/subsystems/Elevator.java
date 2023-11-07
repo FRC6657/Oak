@@ -126,7 +126,7 @@ public class Elevator extends SubsystemBase{
 
     private GenericEntry atSetpointLog = tab.add("Elevator At Setpoint", false)
         .withPosition(0,2)
-        .withSize(2, 2)
+        .withSize(2, 1)
         .getEntry();
         
     private GenericEntry gamePieceLog = tab.add("Game Piece", false)

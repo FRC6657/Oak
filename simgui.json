@@ -31,6 +31,12 @@
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/Talon FX [11]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [12]": "Motor Controller",
+      "/Shuffleboard/Driver UI/Auto Game Piece": "String Chooser",
+      "/Shuffleboard/Driver UI/Auto Path": "String Chooser",
+      "/Shuffleboard/Driver UI/Auto Scoring Level": "String Chooser",
+      "/Shuffleboard/Driver UI/SendableChooser[0]": "String Chooser",
+      "/Shuffleboard/Driver UI/SendableChooser[1]": "String Chooser",
+      "/Shuffleboard/Driver UI/SendableChooser[2]": "String Chooser",
       "/SmartDashboard/ChoreoSwerveControllerCommand_field": "Field2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
@@ -147,7 +153,7 @@
     "Plot <1>": {
       "plots": [
         {
-          "height": 338,
+          "height": 0,
           "series": [
             {
               "color": [
