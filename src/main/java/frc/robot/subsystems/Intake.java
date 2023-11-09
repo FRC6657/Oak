@@ -13,11 +13,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ElevatorConstants.ElevatorSetpoint;
+import frc.robot.Constants.ElevatorConstants.GamePiece;
 import frc.robot.Constants.IntakeConstants.State;
 
 public class Intake extends SubsystemBase {
   private final WPI_TalonFX mMotor;
   private State mCurrentState;
+  private ElevatorSetpoint mElevatorSetpoint = ElevatorConstants.ZERO;
+  private GamePiece mGamePiece = ElevatorConstants.CONE;
+
 
   public Intake() {
     mMotor = new WPI_TalonFX(Constants.IntakeConstants.kIntakeCanID);
@@ -30,10 +36,10 @@ public class Intake extends SubsystemBase {
     mMotor.setNeutralMode(NeutralMode.Brake);
     mMotor.configVoltageCompSaturation(10);
     mMotor.enableVoltageCompensation(true);
-    mMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 25, 25, 0));
+    mMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 10, 0));
   };
 
-  public void changeState(State state){
+  public void changeState(State state, GamePiece piece, ElevatorSetpoint setpoint){
     mCurrentState = state;
   }
 

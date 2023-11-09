@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -73,9 +74,9 @@ public class Robot extends TimedRobot {
     drivetrain.setDefaultCommand(
       new RunCommand(
         () -> drivetrain.drive(
-          -MathUtil.applyDeadband(driveController.getLeftY(), 0.05) * 0.5, 
-          -MathUtil.applyDeadband(driveController.getLeftX(), 0.05) * 0.5, 
-          -MathUtil.applyDeadband(driveController.getRightX(), 0.05) * 0.5, 
+          -MathUtil.applyDeadband(driveController.getLeftY(), 0.05) * 0.25, 
+          -MathUtil.applyDeadband(driveController.getLeftX(), 0.05) * 0.25, 
+          -MathUtil.applyDeadband(driveController.getRightX(), 0.05) * 0.25, 
           true,
           RobotBase.isReal(),
           driveController.a().getAsBoolean()
@@ -84,25 +85,26 @@ public class Robot extends TimedRobot {
       )
     );
 
+
     //Driver Controls
     driveController.b().onTrue(
       Commands.runOnce(drivetrain::changeFeildRelative, drivetrain)
     );
 
-    driveController.leftTrigger().onTrue(
-      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.GRAB))
+    driveController.rightBumper().onTrue(
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.GRAB, elevator.getGamePiece(), elevator.getElevatorSetpoint()))
     );
 
-    driveController.leftTrigger().onFalse(
-      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP))
+    driveController.rightBumper().onFalse(
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.IDLE, elevator.getGamePiece(), elevator.getElevatorSetpoint()))
     );
 
     driveController.rightTrigger().onTrue(
-      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE))
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE, elevator.getGamePiece(), elevator.getElevatorSetpoint()))
     );
 
     driveController.rightTrigger().onFalse(
-      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP))
+      Commands.runOnce(() -> intake.changeState(IntakeConstants.State.IDLE, elevator.getGamePiece(), elevator.getElevatorSetpoint()))
     );
 
     operatorController.button(1).onTrue(
@@ -216,9 +218,9 @@ public class Robot extends TimedRobot {
         Commands.runOnce(() -> elevator.changeGamePiece(pieceChooser.getSelected()), elevator),
         Commands.runOnce(() -> elevator.changeSetpoint(level), elevator),
         Commands.waitUntil(elevator::atSetpoint),
-        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE), intake),
+        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE, elevator.getGamePiece(), elevator.getElevatorSetpoint()), intake),
         Commands.waitSeconds(0.5),
-        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP), intake),
+        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP, elevator.getGamePiece(), elevator.getElevatorSetpoint()), intake),
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.CARRY), elevator),
         Commands.waitUntil(elevator::atSetpoint),
         swerveControllerCommand,

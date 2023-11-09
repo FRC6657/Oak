@@ -78,10 +78,10 @@ public final class Constants {
 
     public static final int kElevatorCanID = 11;
 
-    public static final double kFalconToHeight = (1.0/2048d)*(1d/12d)*(1.751*Math.PI)*Math.sin(Units.degreesToRadians(50));
+    public static final double kFalconToHeight = (1.0/2048d)*(1d/12d)*(1.751*Math.PI)*2*Math.sin(Units.degreesToRadians(50));
     public static final double kStartingHeight = 9.6;
 
-    public static final PIDController kElevatorPID = new PIDController(1/20d, 0, 0);
+    public static final PIDController kElevatorPID = new PIDController(1/15d, 0, 0);
 
     public static class ElevatorSetpoint {
       public double cube;
@@ -105,7 +105,7 @@ public final class Constants {
 
     //Various Setpoints
     public static ElevatorSetpoint ZERO = new ElevatorSetpoint(kStartingHeight, kStartingHeight, "Zero");
-    public static ElevatorSetpoint CARRY = new ElevatorSetpoint(10.00 , 10.00, "Carry");
+    public static ElevatorSetpoint CARRY = new ElevatorSetpoint(10.00 , 13.00, "Carry");
     public static ElevatorSetpoint LEVEL1 = new ElevatorSetpoint(12.50 , 13.00, "Level1");
     public static ElevatorSetpoint LEVEL2 = new ElevatorSetpoint(32.50 , 40.25, "Level2");
     public static ElevatorSetpoint LEVEL3 = new ElevatorSetpoint(46.25 , 53.50, "Level3");
@@ -121,13 +121,13 @@ public final class Constants {
       
     public static final int kIntakeCanID = 12;
     public static final double kInSpeed = 0.5;
-    public static final double kOutSpeed = 0.4;
+    public static final double kOutSpeed = 0.2;
 
     public static enum State {
       
       GRAB(-kInSpeed),
       RELEASE(kOutSpeed),
-      IDLE(-0.1),
+      IDLE(-0.05),
       STOP(0);
 
       public final double speed;

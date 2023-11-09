@@ -59,6 +59,7 @@ public class Elevator extends SubsystemBase{
      */
     private void configureMotor(){
         mMotor.configFactoryDefault(); //Resets the motor to factory defaults
+        mMotor.setInverted(true);
         mMotor.setNeutralMode(NeutralMode.Brake); //Sets the motor to brake mode
         mMotor.configVoltageCompSaturation(10); //Sets the voltage compensation to 10 volts to compensate for battery voltage drop
         mMotor.enableVoltageCompensation(true); //Enables the voltage compensation
@@ -72,7 +73,7 @@ public class Elevator extends SubsystemBase{
      * @return true if the elevator is at its setpoint
      */
     public boolean atSetpoint() {
-        double heightTolerance = 0.5 / 12; 
+        double heightTolerance = 0.5; 
         return (Math.abs(getHeight() - getPieceSetpoint()) < heightTolerance);
     }
 
@@ -80,12 +81,16 @@ public class Elevator extends SubsystemBase{
         return (mGamePiece.isCone) ? mSetpoint.cone : mSetpoint.cube;
     }
 
+    // public void setSpeed(double speed){
+    //     mMotor.set(speed);
+    // }
+
     /***
      * Runs the elevator control loop
      */
     public void run(){
         double clampedSetpoint = MathUtil.clamp(getPieceSetpoint(), ElevatorConstants.kStartingHeight, ElevatorConstants.LEVEL3.cone);
-        mMotor.set(MathUtil.clamp(mPID.calculate(getHeight(), clampedSetpoint), -0.5, 0.5));
+        mMotor.set(MathUtil.clamp(mPID.calculate(getHeight(), clampedSetpoint), -0.75/2, 0.75/2));
     }
 
     /**
@@ -107,6 +112,13 @@ public class Elevator extends SubsystemBase{
         mGamePiece = selected;
     }
 
+    public GamePiece getGamePiece(){
+        return mGamePiece;
+    }
+
+    public ElevatorSetpoint getElevatorSetpoint(){
+        return mSetpoint;
+    }
     private ShuffleboardTab tab = Shuffleboard.getTab("Driver UI");
 
     private GenericEntry heightLog = tab.add("Elevator Height", 0)
@@ -150,13 +162,12 @@ public class Elevator extends SubsystemBase{
         double height = Units.inchesToMeters((getHeight()-9.6));
         double motionRatio = Math.sin(Units.degreesToRadians(40))/ Math.sin(Units.degreesToRadians(50));
 
-        //Stage 1 Relative Position
         // x,y,z w_rot, x_rot, y_rot, z_rot
         // No rotation, no y translation
         double elevatorStageLocations[] = {
             0, 0, 0, 0, 0, 0, 0,
+            (height*motionRatio)/4, 0, height/4, 0, 0, 0, 0,
             (height*motionRatio)/2, 0, height/2, 0, 0, 0, 0,
-            (height*motionRatio), 0, height, 0, 0, 0, 0,
         };
 
         SmartDashboard.putNumberArray("ElevatorPoses", elevatorStageLocations);
