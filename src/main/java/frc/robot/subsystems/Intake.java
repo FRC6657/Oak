@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorSetpoint;
 import frc.robot.Constants.ElevatorConstants.GamePiece;
 import frc.robot.Constants.IntakeConstants.State;
@@ -21,7 +22,6 @@ public class Intake extends SubsystemBase {
  
   private ElevatorSetpoint mElevatorSetpoint = ElevatorConstants.ZERO;
   private GamePiece mGamePiece = ElevatorConstants.CONE;
-
 
   public Intake() {
     mMotor = new WPI_TalonFX(Constants.IntakeConstants.kIntakeCanID);
@@ -38,10 +38,40 @@ public class Intake extends SubsystemBase {
   };
 
   public void changeState(State state, GamePiece piece, ElevatorSetpoint setpoint){
-    mCurrentState = state;
+    
+    if(state == IntakeConstants.State.RELEASE) {
+
+      if(piece == ElevatorConstants.CUBE) {
+
+        if(setpoint == ElevatorConstants.LEVEL1) {
+          mCurrentState = Constants.IntakeConstants.State.RELEASE_CUBE_L1;
+        } else if(setpoint == ElevatorConstants.LEVEL2) {
+          mCurrentState = Constants.IntakeConstants.State.RELEASE_CUBE_L2;
+        } else {
+          mCurrentState = Constants.IntakeConstants.State.RELEASE_CUBE_L3;
+        }
+
+      } else {
+
+        if(setpoint == ElevatorConstants.LEVEL1) {
+          mCurrentState = Constants.IntakeConstants.State.RELEASE_CONE_L1;
+        } else if(setpoint == ElevatorConstants.LEVEL2) {
+          mCurrentState = Constants.IntakeConstants.State.RELEASE_CONE_L2;
+        } else {
+          mCurrentState = Constants.IntakeConstants.State.RELEASE_CONE_L3;
+        }
+      }
+
+    } else if(state == Constants.IntakeConstants.State.GRAB) {
+      mCurrentState = Constants.IntakeConstants.State.GRAB;
+    } else {
+      mCurrentState = Constants.IntakeConstants.State.IDLE;
+    }
+
   }
 
   public void run(){
+
     mMotor.set(mCurrentState.speed);
   }
 

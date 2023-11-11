@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.AutoConstants;
@@ -52,6 +53,7 @@ public class Robot extends TimedRobot {
   ChoreoTrajectory Charge;
   ChoreoTrajectory SubSide;
   ChoreoTrajectory Test;
+  ChoreoTrajectory BumpSideCube;
 
   SendableChooser<GamePiece> pieceChooser = new SendableChooser<GamePiece>();
   SendableChooser<ElevatorSetpoint> levelChooser = new SendableChooser<ElevatorSetpoint>();
@@ -137,11 +139,14 @@ public class Robot extends TimedRobot {
     TrajectoryManager.getInstance().LoadTrajectories();
 
     BumpSide = TrajectoryManager.getInstance().getTrajectory("Bump Side.json");
+    BumpSideCube = TrajectoryManager.getInstance().getTrajectory("Bump Side Cube.json");
     Charge = TrajectoryManager.getInstance().getTrajectory("Charge.json");
     SubSide = TrajectoryManager.getInstance().getTrajectory("Sub Side.json");
     Test = TrajectoryManager.getInstance().getTrajectory("Y4.json");
 
     pathChooser.setDefaultOption("Bump Side", BumpSide);
+
+    pathChooser.addOption("Bump Side Cube", BumpSideCube);
     pathChooser.addOption("Charge", Charge);
     pathChooser.addOption("Sub Side", SubSide);
     pathChooser.setDefaultOption("Test", Test);
@@ -213,12 +218,15 @@ public class Robot extends TimedRobot {
 
     CommandScheduler.getInstance().schedule(
       Commands.sequence(
+        Commands.runOnce(()-> intake.changeState(IntakeConstants.State.GRAB, elevator.getGamePiece(), elevator.getElevatorSetpoint()), intake),
+        Commands.waitSeconds(1),
+        Commands.runOnce(()-> intake.changeState(IntakeConstants.State.IDLE, elevator.getGamePiece(), elevator.getElevatorSetpoint()), intake),
         Commands.runOnce(() -> elevator.changeGamePiece(pieceChooser.getSelected()), elevator),
         Commands.runOnce(() -> elevator.changeSetpoint(level), elevator),
         Commands.waitUntil(elevator::atSetpoint),
         Commands.runOnce(() -> intake.changeState(IntakeConstants.State.RELEASE, elevator.getGamePiece(), elevator.getElevatorSetpoint()), intake),
         Commands.waitSeconds(0.5),
-        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.STOP, elevator.getGamePiece(), elevator.getElevatorSetpoint()), intake),
+        Commands.runOnce(() -> intake.changeState(IntakeConstants.State.IDLE, elevator.getGamePiece(), elevator.getElevatorSetpoint()), intake),
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorConstants.CARRY), elevator),
         Commands.waitUntil(elevator::atSetpoint),
         swerveControllerCommand,

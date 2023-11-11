@@ -81,11 +81,12 @@ public final class Constants {
     public static final double kFalconToHeight = (1.0/2048d)*(1d/12d)*(1.751*Math.PI)*2*Math.sin(Units.degreesToRadians(50));
     public static final double kStartingHeight = 9.6;
 
-    public static final PIDController kElevatorPID = new PIDController(1/15d, 0, 0);
+    public static final PIDController kElevatorPID = new PIDController(1/10d, 0, 0);
 
     public static class ElevatorSetpoint {
       public double cube;
       public double cone;
+      public double cubeSpeed;
       public String name;
     
       public ElevatorSetpoint(double cubeSetpoint, double coneSetpoint, String name) {
@@ -107,7 +108,7 @@ public final class Constants {
     public static ElevatorSetpoint ZERO = new ElevatorSetpoint(kStartingHeight, kStartingHeight, "Zero");
     public static ElevatorSetpoint CARRY = new ElevatorSetpoint(10.00 , 13.00, "Carry");
     public static ElevatorSetpoint LEVEL1 = new ElevatorSetpoint(12.50 , 13.00, "Level1");
-    public static ElevatorSetpoint LEVEL2 = new ElevatorSetpoint(32.50 , 40.25, "Level2");
+    public static ElevatorSetpoint LEVEL2 = new ElevatorSetpoint(37.50 , 41.25, "Level2");
     public static ElevatorSetpoint LEVEL3 = new ElevatorSetpoint(46.25 , 53.50, "Level3");
     public static ElevatorSetpoint DOUBLESUB = new ElevatorSetpoint(42.00 , 42.00, "Double Substation");
 
@@ -126,8 +127,14 @@ public final class Constants {
     public static enum State {
       
       GRAB(-kInSpeed),
-      RELEASE(kOutSpeed),
-      IDLE(-0.05),
+      RELEASE(0.0),
+      RELEASE_CONE_L1(0.2),
+      RELEASE_CONE_L2(0.1),
+      RELEASE_CONE_L3(0.5),
+      RELEASE_CUBE_L1(0.2),
+      RELEASE_CUBE_L2(0.35),
+      RELEASE_CUBE_L3(0.4),
+      IDLE(-0.1),
       STOP(0);
 
       public final double speed;
