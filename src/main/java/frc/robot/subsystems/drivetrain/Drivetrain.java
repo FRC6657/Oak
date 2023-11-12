@@ -186,8 +186,8 @@ public class Drivetrain extends SubsystemBase {
     }
 
     if(_Snap){
-      xSpeedCommanded = xSpeedCommanded*0.75;
-      ySpeedCommanded = ySpeedCommanded*0.75;
+      xSpeedCommanded = xSpeedCommanded*0.55;
+      ySpeedCommanded = ySpeedCommanded*0.55;
       currentRotation = (getSnapAngle()+gyro.getAngle())*0.02;
       SmartDashboard.putNumber("Current rotation", currentRotation);
 

@@ -58,6 +58,7 @@ public class Elevator extends SubsystemBase{
      */
     private void configureMotor(){
         mMotor.configFactoryDefault(); //Resets the motor to factory defaults
+        mMotor.setSelectedSensorPosition(0);
         mMotor.setInverted(true);
         mMotor.setNeutralMode(NeutralMode.Brake); //Sets the motor to brake mode
         mMotor.configVoltageCompSaturation(10); //Sets the voltage compensation to 10 volts to compensate for battery voltage drop

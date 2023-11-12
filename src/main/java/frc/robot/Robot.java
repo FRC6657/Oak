@@ -49,11 +49,12 @@ public class Robot extends TimedRobot {
   private final CommandXboxController driveController = new CommandXboxController(DriverConstants.kDriverControllerPort);
   private final CommandGenericHID operatorController = new CommandGenericHID(DriverConstants.kOperatorControllerPort);
 
-  ChoreoTrajectory BumpSide;
-  ChoreoTrajectory Charge;
-  ChoreoTrajectory SubSide;
-  ChoreoTrajectory Test;
+  ChoreoTrajectory BumpSideCone;
   ChoreoTrajectory BumpSideCube;
+  ChoreoTrajectory ChargeCube;
+  ChoreoTrajectory ChargeCone;
+  ChoreoTrajectory SubSideCone;
+  ChoreoTrajectory SubSideCube;
 
   SendableChooser<GamePiece> pieceChooser = new SendableChooser<GamePiece>();
   SendableChooser<ElevatorSetpoint> levelChooser = new SendableChooser<ElevatorSetpoint>();
@@ -74,9 +75,9 @@ public class Robot extends TimedRobot {
     drivetrain.setDefaultCommand(
       new RunCommand(
         () -> drivetrain.drive(
-          -MathUtil.applyDeadband(driveController.getLeftY(), 0.05) * 0.25, 
-          -MathUtil.applyDeadband(driveController.getLeftX(), 0.05) * 0.25, 
-          -MathUtil.applyDeadband(driveController.getRightX(), 0.05) * 0.25, 
+          -MathUtil.applyDeadband(driveController.getLeftY(), 0.05) * 0.75, 
+          -MathUtil.applyDeadband(driveController.getLeftX(), 0.05) * 0.75, 
+          -MathUtil.applyDeadband(driveController.getRightX(), 0.05) * 0.75, 
           true,
           RobotBase.isReal(),
           driveController.a().getAsBoolean()
@@ -87,7 +88,7 @@ public class Robot extends TimedRobot {
 
 
     //Driver Controls
-    driveController.b().onTrue(
+    driveController.button(8).onTrue(
       Commands.runOnce(drivetrain::changeFeildRelative, drivetrain)
     );
 
@@ -138,18 +139,22 @@ public class Robot extends TimedRobot {
     //Autos
     TrajectoryManager.getInstance().LoadTrajectories();
 
-    BumpSide = TrajectoryManager.getInstance().getTrajectory("Bump Side.json");
+    BumpSideCone = TrajectoryManager.getInstance().getTrajectory("Bump Side Cone.json");
     BumpSideCube = TrajectoryManager.getInstance().getTrajectory("Bump Side Cube.json");
-    Charge = TrajectoryManager.getInstance().getTrajectory("Charge.json");
-    SubSide = TrajectoryManager.getInstance().getTrajectory("Sub Side.json");
-    Test = TrajectoryManager.getInstance().getTrajectory("Y4.json");
+    ChargeCube = TrajectoryManager.getInstance().getTrajectory("Charge Cube.json");
+    ChargeCone = TrajectoryManager.getInstance().getTrajectory("Charge Cone.json");
+    SubSideCone = TrajectoryManager.getInstance().getTrajectory("Sub Side Cone.json");
+    SubSideCube = TrajectoryManager.getInstance().getTrajectory("Sub Side Cube.json");
 
-    pathChooser.setDefaultOption("Bump Side", BumpSide);
+    pathChooser.setDefaultOption("Bump Side Cone", BumpSideCone);
+    pathChooser.setDefaultOption("Bump Side Cube", BumpSideCube);
+   
+    pathChooser.addOption("ChargeCube", ChargeCube);
+    pathChooser.addOption("ChargeCone", ChargeCone);
 
-    pathChooser.addOption("Bump Side Cube", BumpSideCube);
-    pathChooser.addOption("Charge", Charge);
-    pathChooser.addOption("Sub Side", SubSide);
-    pathChooser.setDefaultOption("Test", Test);
+
+    pathChooser.addOption("Sub Side Cone", SubSideCone);
+    pathChooser.addOption("Sub Side Cube", SubSideCube);
 
     pieceChooser.setDefaultOption("Cone", ElevatorConstants.CONE);
     pieceChooser.addOption("Cube", ElevatorConstants.CUBE);
