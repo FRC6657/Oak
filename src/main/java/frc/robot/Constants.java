@@ -130,7 +130,7 @@ public final class Constants {
       
       GRAB(-kInSpeed),
       RELEASE(0.0),
-      RELEASE_CONE_L1(0.1),
+      RELEASE_CONE_L1(0.2),
       RELEASE_CONE_L2(0.05),
       RELEASE_CONE_L3(0.5),
       RELEASE_CUBE_L1(0.1),
